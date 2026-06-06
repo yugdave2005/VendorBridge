@@ -3,7 +3,8 @@
 import { useSidebarStore } from "@/lib/stores/sidebar-store";
 import { cn } from "@/lib/utils";
 import { SessionUser } from "@/types";
-import { Bell, Search, Menu, LogOut, User as UserIcon } from "lucide-react";
+import { Search, Menu, LogOut, User as UserIcon } from "lucide-react";
+import { NotificationBell } from "./NotificationBell";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -60,11 +61,7 @@ export function Navbar({ user }: { user: SessionUser }) {
       </div>
 
       <div className="flex items-center gap-3 sm:gap-5">
-        {/* Notifications Placeholder */}
-        <button className="relative p-2 text-slate-500 hover:text-slate-900 transition-colors rounded-full hover:bg-slate-100">
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
-        </button>
+        <NotificationBell />
 
         {/* User Menu */}
         <DropdownMenu>

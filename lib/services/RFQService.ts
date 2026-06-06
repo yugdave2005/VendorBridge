@@ -174,6 +174,22 @@ export class RFQService {
       { vendorIds: newVendorIds }
     );
 
+    // Notify Vendors
+    for (const vendorId of newVendorIds) {
+      const vendor = await prisma.vendor.findUnique({ where: { id: vendorId } });
+      if (vendor?.userId) {
+        const rfq = await prisma.rFQ.findUnique({ where: { id: rfqId } });
+        await prisma.notification.create({
+          data: {
+            userId: vendor.userId,
+            title: "RFQ Invitation",
+            message: `You have been invited to submit a quotation for RFQ: ${rfq?.title || rfqId}`,
+            link: `/rfqs/${rfqId}`,
+          }
+        });
+      }
+    }
+
     return { count: result.count };
   }
 

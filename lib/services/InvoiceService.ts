@@ -95,8 +95,22 @@ export class InvoiceService {
     const invoice = await prisma.invoice.update({
       where: { id },
       data: { status: InvoiceStatus.PAID, paidAt: new Date() },
+      include: { purchaseOrder: { include: { quotation: { include: { rfq: true } } } } }
     });
     await ActivityLogService.log(actorId, "INVOICE_PAID", "Invoice", id, {});
+
+    // Notify Officer
+    if (invoice.purchaseOrder.quotation.rfq.createdById) {
+      await prisma.notification.create({
+        data: {
+          userId: invoice.purchaseOrder.quotation.rfq.createdById,
+          title: "Invoice Paid",
+          message: `Invoice ${invoice.invoiceNumber} has been marked as paid.`,
+          link: `/invoices/${id}`,
+        }
+      });
+    }
+
     return invoice;
   }
 

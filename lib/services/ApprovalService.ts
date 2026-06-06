@@ -44,6 +44,16 @@ export class ApprovalService {
 
     await ActivityLogService.log(actorId, "APPROVAL_REQUESTED", "Approval", result.id, { quotationId, approverId });
 
+    // Notify Manager
+    await prisma.notification.create({
+      data: {
+        userId: approverId,
+        title: "Approval Request",
+        message: `You have a new quotation approval request pending.`,
+        link: `/approvals/${result.id}`,
+      }
+    });
+
     return result;
   }
 
@@ -53,7 +63,7 @@ export class ApprovalService {
   static async resolveApproval(approvalId: string, status: "APPROVED" | "REJECTED", actorId: string, remarks: string) {
     const approval = await prisma.approval.findUnique({
       where: { id: approvalId },
-      include: { quotation: { include: { rfq: true } } },
+      include: { quotation: { include: { rfq: true, vendor: true } } },
     });
 
     if (!approval) throw new Error("Approval not found");
@@ -112,11 +122,46 @@ export class ApprovalService {
     // 3. Post-transaction triggers (e.g. creating PO if approved)
     if (status === "APPROVED") {
       try {
-        await PurchaseOrderService.createFromQuotation(quotationId, actorId);
+        const po = await PurchaseOrderService.createFromQuotation(quotationId, actorId);
+        
+        // Notify Vendor about PO
+        if (approval.quotation.vendor.userId) {
+          await prisma.notification.create({
+            data: {
+              userId: approval.quotation.vendor.userId,
+              title: "Quotation Accepted & PO Issued",
+              message: `Your quotation has been accepted. A Purchase Order has been issued.`,
+              link: `/purchase-orders/${po.id}`,
+            }
+          });
+        }
       } catch (error) {
         console.error("Failed to generate PO after approval:", error);
-        // We log error but don't fail the approval resolution itself
       }
+    } else {
+       // Notify Vendor of rejection
+       if (approval.quotation.vendor.userId) {
+         await prisma.notification.create({
+           data: {
+             userId: approval.quotation.vendor.userId,
+             title: "Quotation Rejected",
+             message: `Your quotation for RFQ ${approval.quotation.rfq.rfqNumber} was rejected.`,
+             link: `/rfqs/${approval.quotation.rfqId}`,
+           }
+         });
+       }
+    }
+
+    // Notify original POfficer who requested
+    if (approval.quotation.rfq.createdById) {
+       await prisma.notification.create({
+         data: {
+           userId: approval.quotation.rfq.createdById,
+           title: `Approval ${status}`,
+           message: `Your approval request for quotation ${approval.quotation.quotationNumber} was ${status.toLowerCase()}.`,
+           link: `/approvals/${approvalId}`,
+         }
+       });
     }
 
     return await prisma.approval.findUnique({ where: { id: approvalId } });

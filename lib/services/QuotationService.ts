@@ -95,6 +95,16 @@ export class QuotationService {
 
     await ActivityLogService.log(actorId, "QUOTATION_SUBMITTED", "Quotation", quotation.id, { rfqId, quotationNumber });
 
+    // Notify RFQ Creator
+    await prisma.notification.create({
+      data: {
+        userId: rfq.createdById,
+        title: "New Quotation Received",
+        message: `A new quotation has been submitted for RFQ: ${rfq.title}`,
+        link: `/rfqs/${rfqId}/compare`,
+      }
+    });
+
     return quotation;
   }
 
