@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { signOut } from "next-auth/react";
 
 export default function SettingsPage() {
   return (
@@ -65,8 +66,11 @@ export default function SettingsPage() {
               Irreversible actions related to your account.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex flex-col sm:flex-row gap-4">
             <Button variant="destructive" disabled>Deactivate Account</Button>
+            <Button variant="outline" onClick={() => signOut({ callbackUrl: "/login" })} className="text-slate-700">
+              Log Out of Device
+            </Button>
           </CardContent>
         </Card>
       </div>
