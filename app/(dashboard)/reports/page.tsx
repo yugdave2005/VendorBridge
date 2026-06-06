@@ -103,7 +103,7 @@ export default function ReportsPage() {
                 <IndianRupee className="h-4 w-4 text-slate-500" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">₹{kpis.totalSpent.toLocaleString()}</div>
+                <div className="text-2xl font-bold">₹{(kpis.totalSpent || 0).toLocaleString()}</div>
               </CardContent>
             </Card>
           </div>

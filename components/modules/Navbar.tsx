@@ -65,23 +65,20 @@ export function Navbar({ user }: { user: SessionUser }) {
 
         {/* User Menu */}
         <DropdownMenu>
-          {/* @ts-expect-error asChild is valid for Radix but causes TS mismatch in this configuration */}
-          <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-3 hover:opacity-80 transition-opacity focus:outline-none">
-              <div className="hidden sm:block text-right">
-                <p className="text-sm font-medium text-slate-900 leading-none mb-1">
-                  {user.name}
-                </p>
-                <p className="text-xs text-slate-500 leading-none">
-                  {roleLabels[user.role] ?? user.role}
-                </p>
-              </div>
-              <Avatar className="h-9 w-9 border border-slate-200 shadow-sm">
-                <AvatarFallback className="bg-blue-50 text-blue-700 font-medium text-sm">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-            </button>
+          <DropdownMenuTrigger className="flex items-center gap-3 hover:opacity-80 transition-opacity focus:outline-none">
+            <div className="hidden sm:block text-right">
+              <p className="text-sm font-medium text-slate-900 leading-none mb-1">
+                {user.name}
+              </p>
+              <p className="text-xs text-slate-500 leading-none">
+                {roleLabels[user.role] ?? user.role}
+              </p>
+            </div>
+            <Avatar className="h-9 w-9 border border-slate-200 shadow-sm">
+              <AvatarFallback className="bg-blue-50 text-blue-700 font-medium text-sm">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>

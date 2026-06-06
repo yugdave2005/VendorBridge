@@ -21,7 +21,8 @@ export default function ApprovalsPage() {
 
   const columns: ColumnDef<any>[] = [
     {
-      accessorKey: "quotation.rfq.title",
+      id: "title",
+      accessorFn: (row: any) => row.quotation?.rfq?.title,
       header: "RFQ Title",
       cell: ({ row }) => {
         const title = row.original.quotation?.rfq?.title || "Unknown RFQ";
@@ -94,7 +95,7 @@ export default function ApprovalsPage() {
           <DataTable 
             columns={columns} 
             data={data?.data || []} 
-            searchKey="quotation.rfq.title" 
+            searchKey="title" 
             searchPlaceholder="Search by RFQ title..."
           />
         )}
