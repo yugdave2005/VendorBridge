@@ -80,8 +80,9 @@ export class InvoiceService {
     return invoice;
   }
 
-  static async getInvoices() {
+  static async getInvoices(vendorId?: string) {
     return prisma.invoice.findMany({
+      where: vendorId ? { purchaseOrder: { vendorId } } : undefined,
       include: {
         purchaseOrder: {
           select: { poNumber: true, vendor: { select: { companyName: true } } },
