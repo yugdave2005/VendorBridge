@@ -69,7 +69,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: user.email,
           role: user.role,
           name: user.name,
-        };
+          emailVerified: null,
+        } as any;
       },
     }),
   ],
@@ -93,6 +94,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         email: token.email,
         role: token.role,
         name: token.name,
+        emailVerified: null as any,
       };
       return session;
     },
